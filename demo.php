@@ -7,7 +7,7 @@
 	require_once	'Form_NodeValue.php';
 	require_once	'Form_Field.php';
 	require_once	'AddOn/Form_Email.php';
-
+	
 	// Form objects definition
 	class Form_Contact extends Form_Node
 	{
@@ -24,7 +24,7 @@
 		protected function	setDefinition()
 		{
 			parent::setDefinition();
-			$this->hasNode('friend', new Form_Contact)->_limit	=	5;
+			$this->hasNode('friend', new Form_Contact)->hasLimit(0);
 		}
 	}
 	

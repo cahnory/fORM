@@ -1,14 +1,57 @@
 <?php
 
-	class Form_Element implements ArrayAccess, Iterator
+	/**
+	 * LICENSE: Copyright (c) 2010 François 'cahnory' Germain
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 * 
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 * 
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 * that is available through the world-wide-web at the following URI:
+	 * http://www.php.net/license/3_01.txt.  If you did not receive a copy of
+	 * the PHP License and are unable to obtain it through the web, please
+	 * send a note to license@php.net so we can mail you a copy immediately.
+	 *
+	 * @package    FORM
+	 * @author     François 'cahnory' Germain <cahnory@gmail.com>
+	 * @copyright  2010 François Germain
+	 * @license    http://www.opensource.org/licenses/mit-license.php
+	 */
+
+	class FORM_Element implements ArrayAccess, Iterator
 	{
-		protected	$_limit		=	1;
+		private		$_data		=	array();
+		private		$_limit		=	1;
+		protected	$_name;
 		protected	$_offset	=	0;
+		protected	$_parent;
 		protected	$_values	=	array();
 		
 		public	function	__construct()
 		{
 			$this->setDefinition();
+		}
+		
+		public	function	__get($name)
+		{
+			return	$this->data($name);
+		}
+		
+		protected	function	__set($name, $value)
+		{
+			return	$this->hasData($name, $value);
 		}
 		
 		private	function	_hasElement($name, Form_Element $element)
@@ -17,6 +60,8 @@
 				array_splice($this->_values, $key, 1);
 				array_splice($this->_offsets, $key, 1);
 			}
+			$element->_name		=	$name;
+			$element->_parent	=	$this;
 			$this->_values[]	=	$element;
 			$this->_offsets[]	=	$name;
 			return	$element;
@@ -29,12 +74,29 @@
 			$this->_values	=	array();
 		}
 		
+		public	function	data($name = NULL)
+		{
+			if($name === NULL)
+				return	$this->_data;
+			
+			return	array_key_exists($name, $this->_data) ? $this->_data[$name] : NULL;
+		}
+		
 		public	function	fill($value)
 		{
 			if(!is_array($value)) {
 				$this->_values	=	array($value);
 			} else {
 				$this->_values	=	array_slice(array_values($value), 0, $this->_limit);
+			}
+		}
+		
+		protected	function	hasData($name, $value = NULL)
+		{
+			if($value === NULL && is_array($name)) {
+				$this->_data	=	$name;
+			} elseif($value !== NULL) {
+				$this->_data[$name]	=	$value;
 			}
 		}
 		
@@ -46,6 +108,11 @@
 				$field	=	new Form_Field;
 			}
 			return	$this->_hasElement($name, $field);
+		}
+		
+		protected	function	hasLimit($limit)
+		{
+			$this->_limit	=	(int)$limit;
 		}
 		
 		protected	function	hasNode($name, $options = array())
@@ -61,6 +128,27 @@
 		public	function	length()
 		{
 			return	sizeof($this->_values);
+		}
+		
+		public	function	limit()
+		{
+			return	$this->_limit;
+		}
+		
+		public	function	name($full = true)
+		{
+			if(!$full) {
+				$name	=	$this->_name;
+			} elseif($this->_parent === NULL || ($pname = $this->_parent->name($full)) === NULL) {
+				if($this->_limit === 1) {
+					$name	=	NULL;
+				} else {
+					$name	=	$this->_name;
+				}
+			} else {
+				$name	=	$pname.'['.$this->_name.']';
+			}
+			return	$name;
 		}
 		
 		public	function	value()
