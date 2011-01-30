@@ -31,18 +31,34 @@
 	 */
 
 	class FORM_Node extends Form_Element
-	{
+	{		
+		/**
+	     *	Model used on definition
+	     *	of new Form_NodeValue.
+	     *
+	     *	@var Form_NodeValue
+	     *	@access	protected
+	     */
 		protected	$_model;
 		
-		public	function	__construct()
-		{
-		}
+		public	function	__construct() {}
 		
 		protected	function	setDefinition() {}
 		
+		/**
+		 *	Return a node by it's offset
+		 *	If the node doesn't exist it will be created
+		 *	if possible.
+		 *
+		 *	@param mixed $offset node ofsset
+		 *
+		 *	@return mixed Form_NodeValue or NULL
+		 *
+		 *	@access public
+		 */
 		private	function	_getNode($offset)
 		{
-			if($offset < $this->limit() || $this->limit() < 1) {
+			if(is_int($offset) && ($offset < $this->limit() || $this->limit() < 1)) {				
 				if(!array_key_exists($offset, $this->_values)) {					
 					$this->_model			=	new Form_NodeValue;
 					$this->_model->_name	=	$offset;
@@ -54,8 +70,17 @@
 			}
 		}
 		
+		/**
+		 *	Fill the values and children values
+		 *
+		 *	@param mixed $values  the values
+		 *
+		 *	@access public
+		 */
 		public	function	fill($values)
 		{
+			if(!is_array($values))
+				$values	=	array($values);
 			foreach($values as $offset => $value) {
 				if($el = $this->offsetGet($offset)) {
 					$el->fill($value);
@@ -63,16 +88,43 @@
 			}
 		}
 		
-		protected	function	hasField($name, $options = array())
+		/**
+		 *	Add a new field
+		 *
+		 *	@param string     $name  the field name
+		 *	@param Form_Field $field the field
+		 *
+		 *	@return Form_Field the new field
+		 *
+		 *	@access protected
+		 */
+		protected	function	hasField($name, Form_Field $field = NULL)
 		{
-			return	$this->_model->hasField($name, $options);
+			return	$this->_model->hasField($name, $field);
 		}
 		
-		protected	function	hasNode($name, $options = array())
+		/**
+		 *	Add a new node
+		 *
+		 *	@param string    $name the node name
+		 *	@param Form_Node $node the node
+		 *
+		 *	@return Form_Node the new node
+		 *
+		 *	@access protected
+		 */
+		protected	function	hasNode($name, Form_Node $node = NULL)
 		{
-			return	$this->_model->hasNode($name, $options);
+			return	$this->_model->hasNode($name, $node);
 		}
 		
+		/**
+		 *	Return the values
+		 *
+		 *	@return mixed the values
+		 *
+		 *	@access public
+		 */
 		public	function	value()
 		{
 			if($this->limit() === 1) {
@@ -136,7 +188,7 @@
 			if($this->limit() === 1) {
 				return	$this->_getNode(0)->offsetGet($offset);				
 			} else {
-				return	$this->_getNode((int)$offset);
+				return	$this->_getNode($offset);
 			}
 		}
 	}

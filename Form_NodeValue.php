@@ -31,11 +31,14 @@
 	 */
 
 	class FORM_NodeValue extends Form_Element
-	{
-		protected	$_offsets	=	array();
-		
+	{		
 		public	function	__construct() {}
 		
+		/**
+		 *	Clear values
+		 *
+		 *	@access public
+		 */
 		public	function	clear()
 		{
 			foreach($this->_values as $value) {
@@ -43,6 +46,13 @@
 			}
 		}
 		
+		/**
+		 *	Fill the values
+		 *
+		 *	@param mixed $values  the values
+		 *
+		 *	@access public
+		 */
 		public	function	fill($values)
 		{
 			if(!is_array($values)) {
@@ -53,6 +63,13 @@
 			}
 		}
 		
+		/**
+		 *	Return the values
+		 *
+		 *	@return mixed the values
+		 *
+		 *	@access public
+		 */
 		public	function	value()
 		{
 			$output	=	array();

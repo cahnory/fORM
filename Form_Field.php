@@ -31,14 +31,28 @@
 	 */
 
 	class FORM_Field extends Form_Element
-	{
-		protected	$_offset	=	0;
-		protected	$_values	=	array();
-		
+	{		
+		/**
+		 *	No child field
+		 *
+		 *	@final
+		 *	@access protected
+		 */
 		final	protected	function	hasField() {}
 		
+		/**
+		 *	No child node
+		 *
+		 *	@final
+		 *	@access protected
+		 */
 		final	protected	function	hasNode() {}
 		
+		/**
+		 *	Simple field, no validation
+		 *
+		 *	@access public
+		 */
 		public	function	validate()
 		{
 			return	true;

@@ -32,11 +32,63 @@
 
 	class FORM_Element implements ArrayAccess, Iterator
 	{
+		/**
+	     *	Additional datas (ex:placeHolder)
+	     *
+	     *	@var array
+	     *	@access	private
+	     */
 		private		$_data		=	array();
+		
+		/**
+	     *	Max number of values.
+	     *
+	     *  Use a limit < 1 to allow
+	     *	unlimited number of values
+	     *
+	     *	@var int
+	     *	@access	private
+	     */
 		private		$_limit		=	1;
+		
+		/**
+	     *	The element name
+	     *
+	     *	@var string
+	     *	@access	protected
+	     */
 		protected	$_name;
+		
+		/**
+	     *	The current offset position
+	     *
+	     *	@var int
+	     *	@access	protected
+	     */
 		protected	$_offset	=	0;
+		
+		/**
+	     *	Values offsets
+	     *
+	     *	@var array
+	     *	@access	protected
+	     */
+		protected	$_offsets	=	array();
+		
+		/**
+	     *	The parent element
+	     *
+	     *	@var Form_Element
+	     *	@access	protected
+	     */
 		protected	$_parent;
+		
+		/**
+	     *	The values
+	     *
+	     *	@var array
+	     *	@access	protected
+	     */
 		protected	$_values	=	array();
 		
 		public	function	__construct()
@@ -44,16 +96,43 @@
 			$this->setDefinition();
 		}
 		
+		/**
+		 *	Return data value or null
+		 *
+		 *	@param string $name the data name
+		 *
+		 *	@return mixed
+		 *
+		 *	@access public
+		 */
 		public	function	__get($name)
 		{
 			return	$this->data($name);
 		}
 		
+		/**
+		 *	Set data value
+		 *
+		 *	@param string $name  the data name
+		 *	@param string $value the data value
+		 *
+		 *	@access protected
+		 */
 		protected	function	__set($name, $value)
 		{
-			return	$this->hasData($name, $value);
+			$this->hasData($name, $value);
 		}
 		
+		/**
+		 *	Add a new child element
+		 *
+		 *	@param string       $name    the element name
+		 *	@param Form_Element $element the element
+		 *
+		 *	@return Form_Element
+		 *
+		 *	@access private
+		 */
 		private	function	_hasElement($name, Form_Element $element)
 		{
 			if(($key = array_search($name, $this->_offsets)) !== false) {
@@ -67,13 +146,33 @@
 			return	$element;
 		}
 		
+		/**
+		 *	Object definition (to overide)
+		 *
+		 *	@access protected
+		 */
 		protected	function	setDefinition() {}
 		
+		/**
+		 *	Clear values
+		 *
+		 *	@access public
+		 */
 		public	function	clear()
 		{
 			$this->_values	=	array();
 		}
 		
+		
+		/**
+		 *	Return data values
+		 *
+		 *	@param string $name  the data name
+		 *
+		 *	@return mixed the data or null
+		 *
+		 *	@access public
+		 */
 		public	function	data($name = NULL)
 		{
 			if($name === NULL)
@@ -82,6 +181,13 @@
 			return	array_key_exists($name, $this->_data) ? $this->_data[$name] : NULL;
 		}
 		
+		/**
+		 *	Fill the values
+		 *
+		 *	@param mixed $value the values
+		 *
+		 *	@access public
+		 */
 		public	function	fill($value)
 		{
 			if(!is_array($value)) {
@@ -91,6 +197,14 @@
 			}
 		}
 		
+		/**
+		 *	Set data value
+		 *
+		 *	@param string $name  the data name
+		 *	@param string $value the data value
+		 *
+		 *	@access protected
+		 */
 		protected	function	hasData($name, $value = NULL)
 		{
 			if($value === NULL && is_array($name)) {
@@ -100,42 +214,93 @@
 			}
 		}
 		
-		protected	function	hasField($name, $options = array())
+		/**
+		 *	Add a new field
+		 *
+		 *	@param string     $name  the field name
+		 *	@param Form_Field $field the field
+		 *
+		 *	@return Form_Field the new field
+		 *
+		 *	@access protected
+		 */
+		protected	function	hasField($name, Form_Field $field = NULL)
 		{
-			if(is_a($options, 'Form_Field')) {
-				$field	=	$options;
-			} else {
+			if(!is_a($field, 'Form_Field')) {
 				$field	=	new Form_Field;
 			}
 			return	$this->_hasElement($name, $field);
 		}
 		
+		/**
+		 *	Set values limit
+		 *
+		 *	If limit < 1, unlimited
+		 *
+		 *	@param string $limit the limit
+		 *
+		 *	@access protected
+		 */
 		protected	function	hasLimit($limit)
 		{
 			$this->_limit	=	(int)$limit;
 		}
 		
-		protected	function	hasNode($name, $options = array())
+		/**
+		 *	Add a new node
+		 *
+		 *	@param string    $name the node name
+		 *	@param Form_Node $node the node
+		 *
+		 *	@return Form_Node the new node
+		 *
+		 *	@access protected
+		 */
+		protected	function	hasNode($name, Form_Node $node = NULL)
 		{
-			if(is_a($options, 'Form_Node')) {
-				$node	=	$options;
-			} else {
+			if(!is_a($node, 'Form_Node')) {
 				$node	=	new Form_Node;
 			}
 			return	$this->_hasElement($name, $node);
 		}
 		
+		/**
+		 *	Return the number of values
+		 *
+		 *	@return int nb values
+		 *
+		 *	@access public
+		 */
 		public	function	length()
 		{
 			return	sizeof($this->_values);
 		}
 		
+		/**
+		 *	Return the values limit
+		 *
+		 *	@return int Nb values limit
+		 *
+		 *	@access public
+		 */
 		public	function	limit()
 		{
 			return	$this->_limit;
 		}
 		
-		public	function	name($full = true)
+		/**
+		 *	Return the field name
+		 *
+		 *	@param boolean $full If name start from root
+		 *	@param string  $prefix
+		 *	@param string  $glue
+		 *	@param string  $suffix
+		 *
+		 *	@return string the element name
+		 *
+		 *	@access public
+		 */
+		public	function	name($full = true, $prefix = '', $glue = '[', $suffix = ']')
 		{
 			if(!$full) {
 				$name	=	$this->_name;
@@ -146,11 +311,18 @@
 					$name	=	$this->_name;
 				}
 			} else {
-				$name	=	$pname.'['.$this->_name.']';
+				$name	=	$prefix.$pname.$glue.$this->_name.$suffix;
 			}
 			return	$name;
 		}
 		
+		/**
+		 *	Return the values
+		 *
+		 *	@return mixed the values
+		 *
+		 *	@access public
+		 */
 		public	function	value()
 		{
 			return	$this->_limit === 1
@@ -158,6 +330,13 @@
 				:	$this->_values;
 		}
 		
+		/**
+		 *	Validate the values
+		 *
+		 *	@return boolean true/false if valid or not
+		 *
+		 *	@access public
+		 */
 		public	function	validate()
 		{
 			foreach($this->_values as $value) {
