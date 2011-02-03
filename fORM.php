@@ -139,7 +139,7 @@
 		 */
 		public	function	clear()
 		{
-			$this->_values	=	array();
+			$this->fill(array(NULL));
 		}
 		
 		/**
