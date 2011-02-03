@@ -1,33 +1,30 @@
 <?php
 
 	header('Content-type: text/html; charset=utf-8');	// Just for my firstname "ç" :p
-	
-	require_once	'Form_Element.php';
-	require_once	'Form_Node.php';
-	require_once	'Form_NodeValue.php';
-	require_once	'Form_Field.php';
-	require_once	'AddOn/Form_Email.php';
-	
+
+	require_once	'fORM.php';
+	require_once	'AddOn/fORM_Email.php';
+
 	// Form objects definition
-	class Form_Contact extends Form_Node
+	class fORM_Contact extends fORM
 	{
 		protected	function	setDefinition()
 		{
-			$this->hasField('firstname');
-			$this->hasField('lastname');
-			$this->hasField('email', new Form_Email);
+			$this->hasOne('firstname');
+			$this->hasOne('lastname');
+			$this->hasOne('email', new fORM_Email);
 		}
 	}
-	
-	class Form_Send2Friend extends Form_Contact
+
+	class fORM_Send2Friend extends fORM_Contact
 	{
 		protected function	setDefinition()
 		{
 			parent::setDefinition();
-			$this->hasNode('friend', new Form_Contact)->hasLimit(0);
+			$this->hasMany('friend', new fORM_Contact);
 		}
 	}
-	
+
 	// Form input values
 	$post	=	array(
 		'firstname'	=>	'François',
@@ -36,11 +33,13 @@
 		'friend'	=>	array(
 			array(
 				'firstname'	=>	'Bruno',
-				'lastname'	=>	'Carette'
+				'lastname'	=>	'Carette',
+				'email'		=>	'bruno@lesnuls.com'
 			),
 			array(
 				'firstname'	=>	'Chantal',
-				'lastname'	=>	'Lauby'
+				'lastname'	=>	'Lauby',
+				'email'		=>	'chantal@lesnuls.com'
 			),
 			array(
 				'firstname'	=>	'Alain',
@@ -48,12 +47,11 @@
 			)
 		)
 	);
-	
+
 	$f	=	new Form_Send2Friend;
 	$f->fill($post);
+	var_dump($f->value());
 	var_dump($f->validate());
 	$f['friend'][1]['email']	=	'chantal[at]lesnuls.com';
 	var_dump($f->validate());
 	var_dump($f->value());
-	
-?>

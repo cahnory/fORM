@@ -1,14 +1,10 @@
 <?php
 
-	class Form_Email extends Form_Field
-	{		
-		public	function	validate()
+	class fORM_Email extends fORM
+	{
+		protected	function	validateValue($value)
 		{
-			foreach($this->_values as $value) { 
-				if(!filter_var($value, FILTER_VALIDATE_EMAIL))
-					return	false;
-			}
-			return	true;
+			return	filter_var($value, FILTER_VALIDATE_EMAIL);
 		}
 	}
 

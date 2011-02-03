@@ -1,14 +1,10 @@
 <?php
 
-	class Form_URL extends Form_Field
-	{		
-		public	function	validate()
+	class fORM_URL extends fORM
+	{
+		protected	function	validateValue($value)
 		{
-			foreach($this->_values as $value) { 
-				if(!filter_var($value, FILTER_VALIDATE_URL))
-					return	false;
-			}
-			return	true;
+			return	filter_var($value, FILTER_VALIDATE_URL);
 		}
 	}
 

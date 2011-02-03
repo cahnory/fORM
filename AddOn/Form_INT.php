@@ -1,14 +1,10 @@
 <?php
 
-	class Form_INT extends Form_Field
-	{		
-		public	function	validate()
+	class fORM_INT extends fORM
+	{
+		protected	function	validateValue($value)
 		{
-			foreach($this->_values as $value) { 
-				if(!preg_match('#^[0-9]+$#', $this->_value))
-					return	false;
-			}
-			return	true;
+			return	preg_match('#^[0-9]+$#', $value);
 		}
 	}
 
